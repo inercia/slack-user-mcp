@@ -53,7 +53,8 @@ interface GetUserProfileArgs {
 // Tool definitions
 const listChannelsTool: Tool = {
   name: "slack_list_channels",
-  description: "List public channels in the workspace with pagination",
+  description:
+    "List channels (public, private, group DMs and DMs the user can see) with pagination",
   inputSchema: {
     type: "object",
     properties: {
@@ -66,6 +67,12 @@ const listChannelsTool: Tool = {
       cursor: {
         type: "string",
         description: "Pagination cursor for next page of results",
+      },
+      types: {
+        type: "string",
+        description:
+          "Comma-separated conversation types: public_channel, private_channel, mpim, im (default: all four)",
+        default: "public_channel,private_channel,mpim,im",
       },
     },
   },
@@ -243,9 +250,13 @@ export class SlackClient {
     return body;
   }
 
-  async getChannels(limit: number = 100, cursor?: string): Promise<any> {
+  async getChannels(
+    limit: number = 100,
+    cursor?: string,
+    types: string = "public_channel,private_channel,mpim,im",
+  ): Promise<any> {
     const params = new URLSearchParams({
-      types: "public_channel",
+      types,
       exclude_archived: "true",
       limit: Math.min(limit, 200).toString(),
     });
@@ -387,6 +398,7 @@ async function main() {
             const response = await slackClient.getChannels(
               args.limit,
               args.cursor,
+              args.types,
             );
             return {
               content: [{ type: "text", text: JSON.stringify(response) }],
