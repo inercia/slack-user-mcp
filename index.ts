@@ -12,6 +12,7 @@ import {
 interface ListChannelsArgs {
   limit?: number;
   cursor?: string;
+  types?: string;
 }
 
 interface PostMessageArgs {
