@@ -82,6 +82,16 @@ MCP Server for the Slack API, enabling Claude to interact with Slack workspaces 
    - `reactions:write` - Add emoji reactions to messages
    - `users:read` - View users and their basic information
 
+   Additional scopes for private channels, group DMs and DMs (this fork lists them by default).
+   Without them `slack_list_channels` returns `missing_scope` unless you pass a narrower `types`:
+   - `groups:read`, `groups:history` - Private channels
+   - `mpim:read`, `mpim:history` - Group DMs
+   - `im:read`, `im:history` - Direct messages
+
+   The token can only see private channels, group DMs and DMs you are a member of.
+   After adding scopes, reinstall the app and use the new User OAuth Token.
+   Workspace admins may need to approve the new scopes.
+
 3. Install App to Workspace:
    - Click "Install to Workspace" and authorize the app
     - Save the "User OAuth Token" that starts with `xoxp-`.
@@ -164,7 +174,7 @@ npx -y @smithery/cli install @lars-hagen/slack-user-mcp --client claude
 ### Troubleshooting
 
 If you encounter permission errors, verify that:
-1. All required scopes are added to your Slack app
+1. All required scopes are added to your Slack app, the app was reinstalled afterwards, and you use the new token. A `missing_scope` error on `slack_list_channels` means the private/DM scopes are missing: add them, or pass `types: "public_channel"`
 2. The app is properly installed to your workspace
 3. The token and, when needed, workspace ID are correctly copied to your configuration
 4. The app has been added to the channels it needs to access
